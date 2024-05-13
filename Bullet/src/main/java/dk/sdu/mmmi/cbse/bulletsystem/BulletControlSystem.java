@@ -23,11 +23,6 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
     }
 
     @Override
-    public void collision(GameData gameData, World world, Entity entity1, Entity entity2) {
-
-    }
-
-    @Override
     public Entity createBullet(Entity shooter, GameData gameData) {
         Entity bullet = new Bullet();
         bullet.setPolygonCoordinates(1, -1, 1, 1, -1, 1, -1, -1);

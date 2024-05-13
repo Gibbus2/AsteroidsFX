@@ -57,9 +57,4 @@ public class PlayerControlSystem implements IEntityProcessingService {
         }
     }
 
-    @Override
-    public void collision(GameData gameData, World world, Entity entity1, Entity entity2) {
-
-    }
-
 }

@@ -20,7 +20,6 @@ public class AsteroidSplitterImpl implements IAsteroidSplitter {
 
         if(size > 2) {
             System.out.println("Asteroid split");
-            world.setAsteroids(world.getAsteroids() + 2);
 
             Entity split1 = asteroidPlugin.createAsteroid(size, e.getX(), e.getY(), heading1, e.getRotationSpeed(), speed);
             Entity split2 = asteroidPlugin.createAsteroid(size, e.getX(), e.getY(), heading2, e.getRotationSpeed(), speed);
@@ -32,6 +31,8 @@ public class AsteroidSplitterImpl implements IAsteroidSplitter {
             //add to world
             world.addEntity(split1);
             world.addEntity(split2);
+
+            world.setAsteroids(world.getAsteroids() + 2);
         }
     }
 

@@ -1,14 +1,13 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
 import dk.sdu.mmmi.cbse.common.asteroids.Asteroid;
-import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
+import dk.sdu.mmmi.cbse.common.asteroids.IAsteroidSplitter;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
@@ -38,12 +37,6 @@ public class CollisionDetector implements IPostEntityProcessingService {
                     //update entity counters
                     updateEntityCounter(entity1, world);
                     updateEntityCounter(entity2, world);
-
-                    //call all processing services and let them handle the collision (beyond removing from world)
-                    for(IEntityProcessingService iEntityProcessingService : getEntityProcessingServices()){
-                        iEntityProcessingService.collision(gameData, world, entity1, entity2);
-                    }
-
                 }
             }
         }
@@ -57,14 +50,16 @@ public class CollisionDetector implements IPostEntityProcessingService {
         return distance < (entity1.getRadius() + entity2.getRadius());
     }
 
-    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
-        return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    private Collection<? extends IAsteroidSplitter> getAsteroidSplitters() {
+        return ServiceLoader.load(IAsteroidSplitter.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
     private void updateEntityCounter(Entity entity, World world) {
         if (entity instanceof Asteroid) {
             System.out.println("remove asteroids");
             world.setAsteroids(world.getAsteroids() - 1);
+            System.out.println(getAsteroidSplitters());
+            getAsteroidSplitters().stream().findFirst().ifPresent((asteroidSplitter) -> asteroidSplitter.createSplitAsteroid(entity, world));
         }
     }
 
