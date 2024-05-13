@@ -4,8 +4,11 @@ public class GameData {
 
     private int displayWidth  = 800 ;
     private int displayHeight = 800;
+    private int score = 0;
     private final GameKeys keys = new GameKeys();
 
+    private long delta = 0;
+    private long frame = 0;
 
     public GameKeys getKeys() {
         return keys;
@@ -27,5 +30,31 @@ public class GameData {
         return displayHeight;
     }
 
+    public void setDelta(long delta) {
+        this.delta = delta;
+    }
 
+    public long getDelta() {
+        return delta;
+    }
+
+    public void setFrame(long frame) {
+        this.frame = frame;
+    }
+
+    public long getFrame() {
+        return frame;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void incrementScore() {
+        score++;
+    }
 }

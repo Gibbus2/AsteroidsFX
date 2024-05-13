@@ -1,9 +1,6 @@
 package dk.sdu.mmmi.cbse.main;
 
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.GameKeys;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
@@ -27,16 +24,18 @@ public class Main extends Application {
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private long lastFrame;
+    private final Text score = new Text(10, 20, "Score: 0");
+    private long asteroidsSpawnDelta;
 
     public static void main(String[] args) {
         launch(Main.class);
     }
 
     @Override
-    public void start(Stage window) throws Exception {
-        Text text = new Text(10, 20, "Destroyed asteroids: 0");
+    public void start(Stage window) {
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        gameWindow.getChildren().add(text);
+        gameWindow.getChildren().add(score);
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -78,6 +77,8 @@ public class Main extends Application {
             polygons.put(entity, polygon);
             gameWindow.getChildren().add(polygon);
         }
+        lastFrame = System.nanoTime();
+        asteroidsSpawnDelta = 0;
         render();
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
@@ -88,12 +89,35 @@ public class Main extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
+                gameData.setDelta(now - lastFrame);
+                gameData.setFrame(now);
+
+                spawn();
                 update();
                 draw();
                 gameData.getKeys().update();
+
+                lastFrame = now;
             }
 
         }.start();
+    }
+
+    private void spawn(){
+        asteroidsSpawnDelta += gameData.getDelta();
+        int spawnDeltaSec = (int) (asteroidsSpawnDelta/1_000_000_000);
+
+        if(spawnDeltaSec >= 4){
+            if(world.getAsteroids() < 3) {
+                System.out.println("Spawning asteroids");
+                for (IGamePluginService iGamePlugin : getPluginServices()) {
+                    if (iGamePlugin.type() == PluginType.ASTEROIDS) {
+                        iGamePlugin.start(gameData, world);
+                    }
+                }
+            }
+            asteroidsSpawnDelta = 0;
+        }
     }
 
     private void update() {
@@ -102,7 +126,7 @@ public class Main extends Application {
         }
         for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
             postEntityProcessorService.process(gameData, world);
-        }       
+        }
     }
 
     private void draw() {        
@@ -126,6 +150,7 @@ public class Main extends Application {
             polygon.setRotate(entity.getRotation());
         }
 
+        score.setText("Score: " + gameData.getScore());
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {

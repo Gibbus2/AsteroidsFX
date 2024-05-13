@@ -13,23 +13,31 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
     public void process(GameData gameData, World world) {
 
         for (Entity bullet : world.getEntities(Bullet.class)) {
-            double changeX = Math.cos(Math.toRadians(bullet.getRotation()));
-            double changeY = Math.sin(Math.toRadians(bullet.getRotation()));
-            bullet.setX(bullet.getX() + changeX * 3);
-            bullet.setY(bullet.getY() + changeY * 3);
+            bullet.forward(gameData.getDelta());
+
+            //remove bullet if out of bounds
+            if(bullet.getY() > gameData.getDisplayWidth() || bullet.getY() < 0 || bullet.getX() > gameData.getDisplayHeight()  || bullet.getX() < 0){
+                world.removeEntity(bullet);
+            }
         }
+    }
+
+    @Override
+    public void collision(GameData gameData, World world, Entity entity1, Entity entity2) {
+
     }
 
     @Override
     public Entity createBullet(Entity shooter, GameData gameData) {
         Entity bullet = new Bullet();
         bullet.setPolygonCoordinates(1, -1, 1, 1, -1, 1, -1, -1);
-        double changeX = Math.cos(Math.toRadians(shooter.getRotation()));
-        double changeY = Math.sin(Math.toRadians(shooter.getRotation()));
-        bullet.setX(shooter.getX() + changeX * 10);
-        bullet.setY(shooter.getY() + changeY * 10);
-        bullet.setRotation(shooter.getRotation());
+        bullet.setRotation(shooter.getHeading());
+        bullet.setHeading(shooter.getHeading());
         bullet.setRadius(1);
+        bullet.setForwardSpeed(400);
+        bullet.setY(shooter.getY());
+        bullet.setX(shooter.getX());
+        bullet.forceMove(10);
         return bullet;
     }
 }

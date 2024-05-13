@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class World {
 
     private final Map<String, Entity> entityMap = new ConcurrentHashMap<>();
+    private int asteroids = 0;
 
     public String addEntity(Entity entity) {
         entityMap.put(entity.getID(), entity);
@@ -47,4 +48,11 @@ public class World {
         return entityMap.get(ID);
     }
 
+    public void setAsteroids(int asteroids) {
+        this.asteroids = asteroids;
+    }
+
+    public int getAsteroids() {
+        return asteroids;
+    }
 }
