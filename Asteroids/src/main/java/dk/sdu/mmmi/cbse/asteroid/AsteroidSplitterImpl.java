@@ -32,7 +32,7 @@ public class AsteroidSplitterImpl implements IAsteroidSplitter {
             world.addEntity(split1);
             world.addEntity(split2);
 
-            world.setAsteroids(world.getAsteroids() + 2);
+            world.incrementAsteroids(2);
         }
     }
 

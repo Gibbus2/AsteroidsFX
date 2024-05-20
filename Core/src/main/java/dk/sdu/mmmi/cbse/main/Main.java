@@ -6,6 +6,7 @@ import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,10 +31,12 @@ public class Main extends Application {
     private final Pane gameWindow = new Pane();
     private long lastFrame;
     private final Text score = new Text(10, 20, "Score: 0");
-    private long asteroidsSpawnDelta;
     private AnimationTimer animationTimer;
     private boolean paused;
     private final Text textPaused = new Text(0, 0, "Paused");
+
+    private List<IEntityProcessingService> iEntityProcessingServiceList;
+    private List<IPostEntityProcessingService> iPostEntityProcessingServiceList;
 
     public static void main(String[] args) {
         launch(Main.class);
@@ -107,8 +110,11 @@ public class Main extends Application {
             iGamePlugin.start(gameData, world);
         }
 
+        // get all processing services and cache them
+        iEntityProcessingServiceList = getEntityProcessingServices();
+        iPostEntityProcessingServiceList = getPostEntityProcessingServices();
+
         lastFrame = System.nanoTime();
-        asteroidsSpawnDelta = 0;
         setAnimationTimer();
         pause();
 
@@ -124,7 +130,6 @@ public class Main extends Application {
                 gameData.setDelta(now - lastFrame);
                 gameData.setFrame(now);
 
-                spawn();
                 update();
                 draw();
                 gameData.getKeys().update();
@@ -136,28 +141,11 @@ public class Main extends Application {
 
     }
 
-    private void spawn(){
-        asteroidsSpawnDelta += gameData.getDelta();
-        int spawnDeltaSec = (int) (asteroidsSpawnDelta/1_000_000_000);
-
-        if(spawnDeltaSec >= 4){
-            if(world.getAsteroids() < 3) {
-                System.out.println("Spawning asteroids");
-                for (IGamePluginService iGamePlugin : getPluginServices()) {
-                    if (iGamePlugin.type() == EntityType.ASTEROID) {
-                        iGamePlugin.start(gameData, world);
-                    }
-                }
-            }
-            asteroidsSpawnDelta = 0;
-        }
-    }
-
     private void update() {
-        for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
+        for (IEntityProcessingService entityProcessorService : iEntityProcessingServiceList) {
             entityProcessorService.process(gameData, world);
         }
-        for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
+        for (IPostEntityProcessingService postEntityProcessorService : iPostEntityProcessingServiceList) {
             postEntityProcessorService.process(gameData, world);
         }
     }
@@ -207,11 +195,11 @@ public class Main extends Application {
         return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
-    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
+    private List<IEntityProcessingService> getEntityProcessingServices() {
         return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
-    private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
+    private List<IPostEntityProcessingService> getPostEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
