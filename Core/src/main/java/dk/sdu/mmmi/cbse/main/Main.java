@@ -1,6 +1,7 @@
 package dk.sdu.mmmi.cbse.main;
 
 import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.map.IMapSPI;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
@@ -12,6 +13,7 @@ import static java.util.stream.Collectors.toList;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
@@ -67,6 +69,15 @@ public class Main extends Application {
             }
 
         });
+
+        //set background
+        ServiceLoader.load(IMapSPI.class).stream().findFirst().ifPresent( iMapSPIProvider -> {
+            ImageView imageView = iMapSPIProvider.get().getMap();
+            imageView.setFitHeight(gameWindow.getHeight());
+            imageView.setFitWidth(gameWindow.getWidth());
+            gameWindow.getChildren().add(imageView);
+        });
+
 
         // Lookup all Game Plugins using ServiceLoader
         for (IGamePluginService iGamePlugin : getPluginServices()) {
@@ -163,4 +174,8 @@ public class Main extends Application {
     private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
+
+//    private Collection<? extends IMapSPI> getIMapSPI() {
+//        return ServiceLoader.load(IMapSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+//    }
 }
