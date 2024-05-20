@@ -18,22 +18,25 @@ public class EnemyControlSystem implements IEntityProcessingService {
         for(Entity e : world.getEntities(Enemy.class)) {
             Enemy enemy = (Enemy) e;
 
-            int ran = random.nextInt(100);
+            // rotate
+            enemy.rotate(gameData.getDelta(), random.nextBoolean());
+            enemy.setHeading(enemy.getRotation());
 
-            if(ran <= 40){
-                enemy.forward(gameData.getDelta());
-            } else if (ran > 40 && ran <= 50) {
-                enemy.rotate(gameData.getDelta(), false);
-                enemy.setHeading(enemy.getRotation());
-            } else if (ran > 50 && ran <= 60) {
-                enemy.rotate(gameData.getDelta(), false);
-                enemy.setHeading(enemy.getRotation());
-            } else if (ran > 97) {
-                if(enemy.canShoot(gameData.getFrame())) {
-                    //shoot
-                    ServiceLoader<BulletSPI> loader = ServiceLoader.load(BulletSPI.class);
-                    loader.findFirst().ifPresent(bulletSPI -> world.addEntity(bulletSPI.createBullet(enemy, gameData)));
-                }
+            // move forward
+            enemy.forward(gameData.getDelta());
+
+            // stay inside the screen
+            if (enemy.getX() < 0) {
+                enemy.setX(gameData.getDisplayWidth());
+            }
+            if (enemy.getX() > gameData.getDisplayWidth()) {
+                enemy.setX(0);
+            }
+            if (enemy.getY() < 0) {
+                enemy.setY(gameData.getDisplayHeight());
+            }
+            if (enemy.getY() > gameData.getDisplayHeight()) {
+                enemy.setY(0);
             }
         }
 
