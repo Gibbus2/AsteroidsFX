@@ -1,24 +1,25 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
-import dk.sdu.mmmi.cbse.common.asteroids.Asteroid;
 import dk.sdu.mmmi.cbse.common.asteroids.IAsteroidSplitter;
+import dk.sdu.mmmi.cbse.common.data.EntityType;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
 
 public class CollisionDetector implements IPostEntityProcessingService {
 
-    public CollisionDetector() {
-    }
-
     @Override
     public void process(GameData gameData, World world) {
+        List<Entity> toRemove = new ArrayList<>();
+
         // two for loops for all entities in the world
         for (Entity entity1 : world.getEntities()) {
             for (Entity entity2 : world.getEntities()) {
@@ -34,11 +35,21 @@ public class CollisionDetector implements IPostEntityProcessingService {
                     world.removeEntity(entity1);
                     world.removeEntity(entity2);
 
-                    //update entity counters
-                    updateEntityCounter(entity1, world);
-                    updateEntityCounter(entity2, world);
+                    if(entity1.getType() == EntityType.ASTEROID){
+                        //split asteroid
+                        getAsteroidSplitters().stream().findFirst().ifPresent( iAsteroidSplitter -> iAsteroidSplitter.createSplitAsteroid(entity1, world));
+                    }
+
+                    toRemove.add(entity1);
                 }
             }
+        }
+
+        for (Entity entity : toRemove){
+            if(entity.getType() == EntityType.ASTEROID){
+                world.incrementAsteroids(-1);
+            }
+            world.removeEntity(entity);
         }
 
     }
@@ -52,15 +63,6 @@ public class CollisionDetector implements IPostEntityProcessingService {
 
     private Collection<? extends IAsteroidSplitter> getAsteroidSplitters() {
         return ServiceLoader.load(IAsteroidSplitter.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
-
-    private void updateEntityCounter(Entity entity, World world) {
-        if (entity instanceof Asteroid) {
-            System.out.println("remove asteroids");
-            world.setAsteroids(world.getAsteroids() - 1);
-            System.out.println(getAsteroidSplitters());
-            getAsteroidSplitters().stream().findFirst().ifPresent((asteroidSplitter) -> asteroidSplitter.createSplitAsteroid(entity, world));
-        }
     }
 
 }
