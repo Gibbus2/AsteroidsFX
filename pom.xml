@@ -22,6 +22,7 @@
         <module>Enemy</module>
         <module>Map</module>
         <module>CommonEnemy</module>
+        <module>CommonPlayer</module>
     </modules>
     <properties>
         <java>java</java>

@@ -1,4 +1,4 @@
-package dk.sdu.mmmi.cbse.playersystem;
+package dk.sdu.mmmi.cbse.common.player;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 
@@ -9,14 +9,14 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 public class Player extends Entity {
 
     private long lastShot;
-    public Player(){
-        this.setRotationSpeed(400);
-        this.setForwardSpeed(100);
+    private final double timeBetweenShot;
+    public Player(double timeBetweenShot){
         this.lastShot = 0;
+        this.timeBetweenShot = timeBetweenShot;
     }
 
     public boolean canShoot(long now){
-        boolean res = (now - lastShot) > 1_000_000_000/6; //six times a second
+        boolean res = (now - lastShot) > (1_000_000_000 * timeBetweenShot);
         if(res) lastShot = now;
         return res;
     }
