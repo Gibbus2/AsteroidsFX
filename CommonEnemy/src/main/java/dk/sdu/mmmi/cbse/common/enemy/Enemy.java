@@ -2,8 +2,6 @@ package dk.sdu.mmmi.cbse.common.enemy;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 
-import java.util.Random;
-
 public class Enemy extends Entity {
 
     private long lastShot;
@@ -14,7 +12,7 @@ public class Enemy extends Entity {
     }
 
     public boolean canShoot(long now){
-        boolean res = (now - lastShot) > 1_000_000_000/timeBetweenShot;
+        boolean res = (now - lastShot) > (1_000_000_000 * timeBetweenShot);
         if(res) lastShot = now;
         return res;
     }

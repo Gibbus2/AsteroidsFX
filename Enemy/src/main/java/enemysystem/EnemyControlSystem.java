@@ -7,8 +7,11 @@ import dk.sdu.mmmi.cbse.common.enemy.Enemy;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.ServiceLoader;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class EnemyControlSystem implements IEntityProcessingService {
@@ -38,8 +41,16 @@ public class EnemyControlSystem implements IEntityProcessingService {
             if (enemy.getY() > gameData.getDisplayHeight()) {
                 enemy.setY(0);
             }
+
+            if(enemy.canShoot(gameData.getFrame())){
+                getBulletSPI().stream().findFirst().ifPresent( bulletSPI -> world.addEntity(bulletSPI.createBullet(enemy, gameData)));
+            }
         }
 
+    }
+
+    private Collection<? extends BulletSPI> getBulletSPI() {
+        return ServiceLoader.load(BulletSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
 }
