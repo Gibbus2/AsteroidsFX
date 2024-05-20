@@ -150,7 +150,6 @@ public class Main extends Application {
             polygon.setRotate(entity.getRotation());
         }
 
-        score.setText("Score: " + gameData.getScore());
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
