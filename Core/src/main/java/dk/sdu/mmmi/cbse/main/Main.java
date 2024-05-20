@@ -144,7 +144,7 @@ public class Main extends Application {
             if(world.getAsteroids() < 3) {
                 System.out.println("Spawning asteroids");
                 for (IGamePluginService iGamePlugin : getPluginServices()) {
-                    if (iGamePlugin.type() == PluginType.ASTEROIDS) {
+                    if (iGamePlugin.type() == EntityType.ASTEROID) {
                         iGamePlugin.start(gameData, world);
                     }
                 }

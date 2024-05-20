@@ -2,7 +2,7 @@ package enemysystem;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.PluginType;
+import dk.sdu.mmmi.cbse.common.data.EntityType;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.enemy.Enemy;
@@ -23,6 +23,8 @@ public class EnemyPlugin implements IGamePluginService {
         ship.setRotation(90); // spawn looking down
         ship.setRotationSpeed(300);
         ship.setForwardSpeed(100);
+
+        ship.setType(EntityType.ENEMY);
         return ship;
     }
 
@@ -32,7 +34,7 @@ public class EnemyPlugin implements IGamePluginService {
     }
 
     @Override
-    public PluginType type() {
-        return PluginType.ENEMY;
+    public EntityType type() {
+        return EntityType.ENEMY;
     }
 }

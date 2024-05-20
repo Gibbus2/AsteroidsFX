@@ -6,7 +6,8 @@ import java.util.UUID;
 public class Entity implements Serializable {
 
     private final UUID ID = UUID.randomUUID();
-    
+
+    private EntityType type;
     private double[] polygonCoordinates;
     private double x;
     private double y;
@@ -21,6 +22,13 @@ public class Entity implements Serializable {
         return ID.toString();
     }
 
+    public EntityType getType() {
+        return type;
+    }
+
+    public void setType(EntityType type) {
+        this.type = type;
+    }
 
     public void setPolygonCoordinates(double... coordinates ) {
         this.polygonCoordinates = coordinates;

@@ -52,6 +52,10 @@ public class World {
         this.asteroids = asteroids;
     }
 
+    public void incrementAsteroids(int count){
+        this.asteroids += count;
+    }
+
     public int getAsteroids() {
         return asteroids;
     }

@@ -1,7 +1,7 @@
 package dk.sdu.mmmi.cbse.common.services;
 
 import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.PluginType;
+import dk.sdu.mmmi.cbse.common.data.EntityType;
 import dk.sdu.mmmi.cbse.common.data.World;
 
 public interface IGamePluginService {
@@ -10,5 +10,5 @@ public interface IGamePluginService {
 
     void stop(GameData gameData, World world);
 
-    PluginType type();
+    EntityType type();
 }
