@@ -3,19 +3,22 @@ package enemysystem;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.enemy.Enemy;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 
+import java.util.Random;
 import java.util.ServiceLoader;
 
 
 public class EnemyControlSystem implements IEntityProcessingService {
+    Random random = new Random();
     @Override
     public void process(GameData gameData, World world) {
         for(Entity e : world.getEntities(Enemy.class)) {
             Enemy enemy = (Enemy) e;
 
-            int ran = enemy.getRand().nextInt(100);
+            int ran = random.nextInt(100);
 
             if(ran <= 40){
                 enemy.forward(gameData.getDelta());
