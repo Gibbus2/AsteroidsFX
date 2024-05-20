@@ -26,8 +26,8 @@ public class AsteroidPlugin implements IGamePluginService {
         // Remove entities
         for (Entity asteroid : world.getEntities(Asteroid.class)) {
             world.removeEntity(asteroid);
+            world.incrementEnemies(-1);
         }
-        world.setAsteroids(0);
     }
 
     @Override

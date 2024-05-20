@@ -14,6 +14,7 @@ public class World {
 
     private final Map<String, Entity> entityMap = new ConcurrentHashMap<>();
     private int asteroids = 0;
+    private int enemies = 0;
 
     public String addEntity(Entity entity) {
         entityMap.put(entity.getID(), entity);
@@ -58,5 +59,16 @@ public class World {
 
     public int getAsteroids() {
         return asteroids;
+    }
+
+    public void setEnemies(int enemies) {
+        this.enemies = enemies;
+    }
+    public void incrementEnemies(int count){
+        this.enemies += count;
+    }
+
+    public int getEnemies() {
+        return enemies;
     }
 }
