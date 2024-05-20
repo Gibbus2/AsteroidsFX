@@ -16,7 +16,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -29,6 +31,9 @@ public class Main extends Application {
     private long lastFrame;
     private final Text score = new Text(10, 20, "Score: 0");
     private long asteroidsSpawnDelta;
+    private AnimationTimer animationTimer;
+    private boolean paused;
+    private final Text textPaused = new Text(0, 0, "Paused");
 
     public static void main(String[] args) {
         launch(Main.class);
@@ -37,7 +42,27 @@ public class Main extends Application {
     @Override
     public void start(Stage window) {
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+
+        //set background
+        ServiceLoader.load(IMapSPI.class).stream().findFirst().ifPresent( iMapSPIProvider -> {
+            ImageView imageView = iMapSPIProvider.get().getMap();
+            imageView.setFitHeight(gameWindow.getHeight());
+            imageView.setFitWidth(gameWindow.getWidth());
+            gameWindow.getChildren().add(imageView);
+        });
+
+        //score text
+        score.setFont(new Font(15));
+        score.setFill(Color.WHITE);
         gameWindow.getChildren().add(score);
+
+        //paused text
+        textPaused.setFont(new Font(30));
+        textPaused.setFill(Color.WHITE);
+        textPaused.setX(((double) gameData.getDisplayWidth()/2) - (textPaused.getLayoutBounds().getWidth()/2));
+        textPaused.setY(((double) gameData.getDisplayHeight() /2) - (textPaused.getLayoutBounds().getHeight()/2));
+        gameWindow.getChildren().add(textPaused);
+
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -52,6 +77,13 @@ public class Main extends Application {
             }
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, true);
+            }
+            if (event.getCode().equals(KeyCode.ESCAPE)){
+                if(!paused) {
+                    pause();
+                }else {
+                    unpause();
+                }
             }
         });
         scene.setOnKeyReleased(event -> {
@@ -70,34 +102,23 @@ public class Main extends Application {
 
         });
 
-        //set background
-        ServiceLoader.load(IMapSPI.class).stream().findFirst().ifPresent( iMapSPIProvider -> {
-            ImageView imageView = iMapSPIProvider.get().getMap();
-            imageView.setFitHeight(gameWindow.getHeight());
-            imageView.setFitWidth(gameWindow.getWidth());
-            gameWindow.getChildren().add(imageView);
-        });
-
-
         // Lookup all Game Plugins using ServiceLoader
         for (IGamePluginService iGamePlugin : getPluginServices()) {
             iGamePlugin.start(gameData, world);
         }
-        for (Entity entity : world.getEntities()) {
-            Polygon polygon = new Polygon(entity.getPolygonCoordinates());
-            polygons.put(entity, polygon);
-            gameWindow.getChildren().add(polygon);
-        }
+
         lastFrame = System.nanoTime();
         asteroidsSpawnDelta = 0;
-        render();
+        setAnimationTimer();
+        pause();
+
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
         window.show();
     }
 
-    private void render() {
-        new AnimationTimer() {
+    private void setAnimationTimer() {
+        animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 gameData.setDelta(now - lastFrame);
@@ -111,7 +132,8 @@ public class Main extends Application {
                 lastFrame = now;
             }
 
-        }.start();
+        };
+
     }
 
     private void spawn(){
@@ -153,6 +175,9 @@ public class Main extends Application {
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
                 polygon = new Polygon(entity.getPolygonCoordinates());
+                polygon.setFill(Color.BLACK);
+                polygon.setStroke(Color.WHITE);
+                polygon.setStrokeWidth(0.6);
                 polygons.put(entity, polygon);
                 gameWindow.getChildren().add(polygon);
             }
@@ -161,6 +186,21 @@ public class Main extends Application {
             polygon.setRotate(entity.getRotation());
         }
 
+    }
+
+    private void pause(){
+        animationTimer.stop();
+        paused = true;
+
+        textPaused.setVisible(true);
+    }
+
+    private void unpause(){
+        textPaused.setVisible(false);
+
+        lastFrame = System.nanoTime();
+        animationTimer.start();
+        paused = false;
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
@@ -175,7 +215,4 @@ public class Main extends Application {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
-//    private Collection<? extends IMapSPI> getIMapSPI() {
-//        return ServiceLoader.load(IMapSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-//    }
 }
