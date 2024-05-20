@@ -32,8 +32,9 @@ public class Main extends Application {
     private long lastFrame;
     private final Text score = new Text(10, 20, "Score: 0");
     private AnimationTimer animationTimer;
-    private boolean paused;
+    private boolean paused, gameOver;
     private final Text textPaused = new Text(0, 0, "Paused");
+    private final Text textGameOver = new Text(0, 0, "GAME OVER");
 
     private List<IEntityProcessingService> iEntityProcessingServiceList;
     private List<IPostEntityProcessingService> iPostEntityProcessingServiceList;
@@ -66,6 +67,14 @@ public class Main extends Application {
         textPaused.setY(((double) gameData.getDisplayHeight() /2) - (textPaused.getLayoutBounds().getHeight()/2));
         gameWindow.getChildren().add(textPaused);
 
+        //game over text
+        textGameOver.setFont(new Font(40));
+        textGameOver.setFill(Color.WHITE);
+        textGameOver.setX(((double) gameData.getDisplayWidth()/2) - (textGameOver.getLayoutBounds().getWidth()/2));
+        textGameOver.setY(((double) gameData.getDisplayHeight() /2) - (textGameOver.getLayoutBounds().getHeight()/2));
+        textGameOver.setVisible(false);
+        gameWindow.getChildren().add(textGameOver);
+
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -82,10 +91,12 @@ public class Main extends Application {
                 gameData.getKeys().setKey(GameKeys.SPACE, true);
             }
             if (event.getCode().equals(KeyCode.ESCAPE)){
-                if(!paused) {
-                    pause();
-                }else {
-                    unpause();
+                if(!gameOver) {
+                    if (!paused) {
+                        pause();
+                    } else {
+                        unpause();
+                    }
                 }
             }
         });
@@ -118,6 +129,8 @@ public class Main extends Application {
         setAnimationTimer();
         pause();
 
+        gameOver = false;
+
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
         window.show();
@@ -135,6 +148,10 @@ public class Main extends Application {
                 gameData.getKeys().update();
 
                 lastFrame = now;
+
+                if(!playerAlive()){
+                    gameOver();
+                }
             }
 
         };
@@ -176,6 +193,15 @@ public class Main extends Application {
 
     }
 
+    private boolean playerAlive(){
+        for (Entity entity : world.getEntities()){
+            if(entity.getType() == EntityType.PLAYER){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void pause(){
         animationTimer.stop();
         paused = true;
@@ -189,6 +215,22 @@ public class Main extends Application {
         lastFrame = System.nanoTime();
         animationTimer.start();
         paused = false;
+    }
+
+    private void gameOver(){
+        gameOver = true;
+
+        //stop timer
+        animationTimer.stop();
+
+        //stop all plugins
+        for (IGamePluginService gamePluginService : getPluginServices()){
+            gamePluginService.stop(gameData, world);
+        }
+
+        //Display text
+        textGameOver.setVisible(true);
+
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
