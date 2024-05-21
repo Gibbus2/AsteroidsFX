@@ -2,10 +2,7 @@ package dk.sdu.mmmi.cbse.playersystem;
 
 
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.GameKeys;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.player.Player;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import java.util.ServiceLoader;
@@ -35,7 +32,11 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 if(player.canShoot(gameData.getFrame())) {
 
                     ServiceLoader<BulletSPI> loader = ServiceLoader.load(BulletSPI.class);
-                    loader.findFirst().ifPresent(bulletSPI -> world.addEntity(bulletSPI.createBullet(player, gameData)));
+                    loader.findFirst().ifPresent(bulletSPI -> {
+                        Entity bullet = bulletSPI.createBullet(player, gameData);
+                        bullet.setParentType(EntityType.PLAYER);
+                        world.addEntity(bullet);
+                    });
 
                 }
             }

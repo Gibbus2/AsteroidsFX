@@ -36,8 +36,15 @@ public class CollisionDetector implements IPostEntityProcessingService {
                     world.removeEntity(entity2);
 
                     if(entity1.getType() == EntityType.ASTEROID){
-                        //split asteroid
                         getAsteroidSplitters().stream().findFirst().ifPresent( iAsteroidSplitter -> iAsteroidSplitter.createSplitAsteroid(entity1, world));
+                        if(entity2.getType() == EntityType.BULLET && entity2.getParentType() == EntityType.PLAYER){
+                            gameData.incrementScore(1);
+                        }
+                    } else if (entity2.getType() == EntityType.ASTEROID) {
+                        getAsteroidSplitters().stream().findFirst().ifPresent( iAsteroidSplitter -> iAsteroidSplitter.createSplitAsteroid(entity2, world));
+                        if(entity1.getType() == EntityType.BULLET && entity1.getParentType() == EntityType.PLAYER){
+                            gameData.incrementScore(1);
+                        }
                     }
 
                     toRemove.add(entity1);
@@ -48,6 +55,9 @@ public class CollisionDetector implements IPostEntityProcessingService {
         for (Entity entity : toRemove){
             if(entity.getType() == EntityType.ASTEROID){
                 world.incrementAsteroids(-1);
+            }
+            if(entity.getType() == EntityType.ENEMY){
+                world.incrementEnemies(-1);
             }
             world.removeEntity(entity);
         }

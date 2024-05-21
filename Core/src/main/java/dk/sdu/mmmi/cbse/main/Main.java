@@ -145,13 +145,14 @@ public class Main extends Application {
 
                 update();
                 draw();
+                updateUI();
                 gameData.getKeys().update();
-
-                lastFrame = now;
 
                 if(!playerAlive()){
                     gameOver();
                 }
+
+                lastFrame = now;
             }
 
         };
@@ -200,6 +201,10 @@ public class Main extends Application {
             }
         }
         return false;
+    }
+
+    private void updateUI(){
+        this.score.setText("Score: " + gameData.getScore());
     }
 
     private void pause(){

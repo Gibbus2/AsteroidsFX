@@ -9,6 +9,8 @@ public class GameData {
     private long delta = 0;
     private long frame = 0;
 
+    private int score = 0;
+
     public GameKeys getKeys() {
         return keys;
     }
@@ -43,5 +45,13 @@ public class GameData {
 
     public long getFrame() {
         return frame;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void incrementScore(int count){
+        this.score += count;
     }
 }

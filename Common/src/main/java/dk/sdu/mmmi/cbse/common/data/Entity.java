@@ -8,6 +8,7 @@ public class Entity implements Serializable {
     private final UUID ID = UUID.randomUUID();
 
     private EntityType type;
+    private EntityType parentType;
     private double[] polygonCoordinates;
     private double x;
     private double y;
@@ -94,6 +95,14 @@ public class Entity implements Serializable {
 
     public double getHeading() {
         return heading;
+    }
+
+    public void setParentType(EntityType parentType) {
+        this.parentType = parentType;
+    }
+
+    public EntityType getParentType() {
+        return parentType;
     }
 
     public void rotate(long delta, boolean right){
