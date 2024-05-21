@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>Map</artifactId>
-    <name>Archetype - Map</name>
+    <name>Map</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>CommonEnemy</artifactId>
-    <name>Archetype - CommonEnemy</name>
+    <name>CommonEnemy</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

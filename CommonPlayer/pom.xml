@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>CommonPlayer</artifactId>
-    <name>Archetype - CommonPlayer</name>
+    <name>CommonPlayer</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
